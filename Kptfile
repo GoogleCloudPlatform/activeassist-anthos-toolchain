@@ -1,0 +1,35 @@
+apiVersion: kpt.dev/v1alpha1
+kind: Kptfile
+metadata:
+  name: activeassist-kpt-example
+packageMetadata:
+  shortDescription: Recommendations manager for GCP resources managed by KCC
+openAPI:
+  definitions:
+    io.k8s.cli.setters.projectid:
+      x-k8s-cli:
+        setter:
+          name: projectid
+          value: CHANGE_ME
+          required: true
+    io.k8s.cli.setters.namespace:
+      x-k8s-cli:
+        setter:
+          name: namespace
+          value: activeassist
+          required: true
+    io.k8s.cli.setters.gcloud.core.project:
+      x-k8s-cli:
+        setter:
+          name: gcloud.core.project
+          value: PROJECT_ID
+    io.k8s.cli.substitutions.namespace-annotation:
+      x-k8s-cli:
+        substitution:
+          name: namespace-annotation
+          pattern: cnrm.cloud.google.com/project-id:${projectid}
+          values:
+          - marker: ${namespace}
+            ref: '#/definitions/io.k8s.cli.setters.namespace'
+          - marker: ${projectid}
+            ref: '#/definitions/io.k8s.cli.setters.projectid'

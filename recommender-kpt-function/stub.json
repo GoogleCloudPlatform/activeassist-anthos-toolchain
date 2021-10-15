@@ -1,0 +1,47 @@
+[
+  {
+    "name": "projects/99999999/locations/us-west1-a/recommenders/google.compute.instance.MachineTypeRecommender/recommendations/9c92e597-9f69-42db-84d5-81d0aeccd1de",
+    "description": "Save cost by changing machine type from n1-standard-1 to g1-small.",
+    "lastRefreshTime": "2020-11-25T07:39:03Z",
+    "primaryImpact": {
+      "category": "COST",
+      "costProjection": {
+        "cost": {
+          "currencyCode": "USD",
+          "units": "-11",
+          "nanos": -7238768
+        },
+        "duration": "2592000s"
+      }
+    },
+    "content": {
+      "operationGroups": [
+        {
+          "operations": [
+            {
+              "action": "test",
+              "resourceType": "compute.googleapis.com/Instance",
+              "resource": "//compute.googleapis.com/projects/_PROJECT_/zones/us-west1-a/instances/computeinstance-sample-cloudmachine",
+              "path": "/machineType",
+              "valueMatcher": {
+                "matchesPattern": ".*zones/us-west1-a/machineTypes/n1-standard-1"
+              }
+            },
+            {
+              "action": "replace",
+              "resourceType": "compute.googleapis.com/Instance",
+              "resource": "//compute.googleapis.com/projects/_PROJECT_/zones/us-west1-a/instances/computeinstance-sample-cloudmachine",
+              "path": "/machineType",
+              "value": "zones/us-west1-a/machineTypes/g1-small"
+            }
+          ]
+        }
+      ]
+    },
+    "stateInfo": {
+      "state": "ACTIVE"
+    },
+    "etag": "\"5c5d89ab727d801f\"",
+    "recommenderSubtype": "CHANGE_MACHINE_TYPE"
+  }
+]

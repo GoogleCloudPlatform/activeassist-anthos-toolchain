@@ -1,0 +1,75 @@
+# Copyright 2021 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+steps:
+- id: 'Get GitHub token'
+  name: gcr.io/cloud-builders/gcloud
+  entrypoint: 'bash'
+  args: [ '-c', 'gcloud secrets versions access latest --secret=github-pat > /root/token/github' ]
+  volumes:
+  - name: 'token'
+    path: /root/token
+ 
+- id: 'Find original hydrated manifests'
+  name: 'gcr.io/${RECO_MGR_PROJECT}/kpt-dev-gh:1'
+  args:
+  - -c
+  - |
+    mkdir original
+    cd recommender-kpt-function
+    npm install
+    npm run build
+    kpt fn source ../namespaces | node ./dist/noop_run.js | kpt fn sink ../original
+  entrypoint: '/bin/sh'
+ 
+- id: 'Run recommender function'
+  name: 'gcr.io/${RECO_MGR_PROJECT}/kpt-dev-gh:1'
+  args:
+  - -c
+  - |
+    mkdir recommendations
+    cd recommender-kpt-function
+    npm install
+    npm run build
+    export STUB_PROJECT=${RECO_MGR_PROJECT}
+    kpt fn source ../namespaces | node ./dist/activeassist_run.js | kpt fn sink ../recommendations
+  entrypoint: '/bin/sh'
+ 
+- id: 'Find Diff'
+  name: 'gcr.io/${RECO_MGR_PROJECT}/kpt-dev-gh:1'
+  args:
+  - -c
+  - |
+    diff -Naur ./original ./recommendations > diff.txt || exit 1
+  entrypoint: '/bin/sh'
+ 
+- id: 'Create GitHub Issue'
+  name: 'gcr.io/${RECO_MGR_PROJECT}/kpt-dev-gh:1'
+  args:
+  - -c
+  - |
+    export GITHUB_TOKEN="$(cat /root/token/github)"
+    if [ -s diff.txt ]
+    then
+      gh issue create \
+        --title "Recommendations from Active Assist" \
+        --body "\`\`\`$(cat diff.txt)\`\`\`" \
+        --repo=${DRY_REPO_OWNER}/${DRY_REPO_NAME}
+    else
+      echo "No diff found"
+    fi
+  entrypoint: '/bin/sh'
+  volumes:
+  - name: 'token'
+    path: /root/token

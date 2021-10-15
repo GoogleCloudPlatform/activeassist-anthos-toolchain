@@ -1,0 +1,37 @@
+{
+  "name": "activeassist-kcc",
+  "version": "0.1.0",
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -Rf node_modules/ dist/",
+    "pretest": "npm run build",
+    "test": "jasmine --config=jasmine.json",
+    "kpt:docker-create": "kpt docker-create",
+    "kpt:docker-build": "kpt docker-build",
+    "kpt:docker-push": "kpt docker-push",
+    "kpt:function-create": "kpt function-create",
+    "kpt:type-create": "kpt type-create"
+  },
+  "dependencies": {
+    "@types/request-promise": "^4.1.46",
+    "googleapis": "^60.0.1",
+    "kpt-functions": "^0.14.0",
+    "npm": "^6.14.8",
+    "pkg": "^4.4.9",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.6"
+  },
+  "devDependencies": {
+    "create-kpt-functions": "^0.17.0",
+    "@types/jasmine": "^3.3.12",
+    "@types/node": "^12.7.2",
+    "jasmine": "^3.4.0",
+    "tslint": "^5.19.0",
+    "typescript": "^3.5.3"
+  },
+  "kpt": {
+    "docker_repo_base": "payaljain"
+  }
+}
